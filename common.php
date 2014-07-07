@@ -3,15 +3,16 @@ require_once './libs/BaiduPCS.class.php';
 //baidu account config
 $bd_account_conf = array('api_key'     => 'Hj2XuP1pjs8FfVff9q3ipgfe',
 			 'secret_key'  => 'VPMjulRaL0KOT1c5GgwaUiLb408uxc9e',
-			 'authorize_uri' => 'https://openapi.baidu.com/oauth/2.0/token',
+			 'authorize_uri' => 'https://openapi.baidu.com/oauth/2.0/authorize',
+			 'refresh_uri' => 'https://openapi.baidu.com/oauth/2.0/token',
 			 );
 
 function get_access_token() {
 	global $bd_account_conf;
 	$params = array(
-			'grant_type'    => 'client_credentials',
+			'response_type'    => 'token',
 			'client_id'     => $bd_account_conf['api_key'],
-			'client_secret' => $bd_account_conf['secret_key'],
+			'redirect_uri' => 'oob',
 			'scope'         => 'netdisk',
 			);
 
@@ -19,13 +20,29 @@ function get_access_token() {
 	$url  = $bd_account_conf['authorize_uri'];
 	$url .= strpos($bd_account_conf['authorize_uri'], '?') ? '&' : '?';
 	$url .= $params;
-	echo $url;exit;
+	//echo $url;exit;
 	$requestCore = new RequestCore();
 	$requestCore->set_request_url($url);
 	$requestCore->send_request();
 	$result = $requestCore->get_response_body ();
 	print_r($result);exit;
 	return $result;
+}
+function refresh_token() {
+	 global $bd_account_conf;
+	$token = '23.3b25e33f8a1d3f2d13fefa02754de27b.2592000.1407078369.2604610008-2967571';
+	$params = array(
+			'grant_type' => 'refresh_token',
+			'refresh_token' => $token,
+			'client_id' => $bd_account_conf['api_key'],
+			'client_secret' => $bd_account_conf['secret_key'],
+			'scope' => 'netdisk'
+			);
+	$params = http_build_query ( $params, '', '&' );
+	$url  = $bd_account_conf['refresh_uri'];
+	$url .= strpos($bd_account_conf['refresh_uri'], '?') ? '&' : '?';
+	$url .= $params;
+	echo $url;exit;
 }
 function http_post($url, $param = array()) {
 	$post_data = '';
@@ -46,10 +63,10 @@ function http_post($url, $param = array()) {
 	return $reponse;
 }
 
-function format_bytes($size) { 
-	$units = array(' B', ' KB', ' MB', ' GB', ' TB'); 
-	for ($i = 0; $size >= 1024 && $i < 4; $i++) $size /= 1024; 
-	return round($size, 2).$units[$i]; 
+function format_bytes($size) {
+	$units = array(' B', ' KB', ' MB', ' GB', ' TB');
+	for ($i = 0; $size >= 1024 && $i < 4; $i++) $size /= 1024;
+	return round($size, 2).$units[$i];
 }
 
 function output($result) {
@@ -76,7 +93,7 @@ $params = array(
 //print_r($result);
 
 //get_access_token();
-$access_token = '23.e4fa6dae708bb8b993660b7dbb6e4423.2592000.1405346988.2604610008-2921205';
+$access_token = '23.3b25e33f8a1d3f2d13fefa02754de27b.2592000.1407078369.2604610008-2967571';
 
 
 
